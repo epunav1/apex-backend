@@ -117,13 +117,6 @@ async def _fulfill_order(order: dict) -> dict:
                 "status": "submitted",
                 "cj_order_id": cj_order_id,
             })
-            return {
-                "status": "submitted",
-                "shopify_order_id": shopify_order_id,
-                "shopify_order_name": shopify_order_name,
-                "cj_order_id": cj_order_id,
-                "unmapped_items": unmapped,
-            }
             await send_order_notification(
                 order_id=shopify_order_id,
                 order_name=shopify_order_name,
@@ -131,6 +124,12 @@ async def _fulfill_order(order: dict) -> dict:
                 total=order.get("total_price", "0"),
                 customer=order.get("customer", {})
             )
+            return {
+                "status": "submitted",
+                "shopify_order_id": shopify_order_id,
+                "shopify_order_name": shopify_order_name,
+                "cj_order_id": cj_order_id,
+                "unmapped_items": unmapped,
             }
         else:
             error_msg = result.get("message", "CJ returned result=false")
