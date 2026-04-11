@@ -27,6 +27,7 @@ from db import (
     upsert_product_mapping,
 )
 from services.cj import create_order, get_order_status, search_product, get_product_variants
+from services.notify import send_order_notification
 
 router = APIRouter()
 
@@ -122,6 +123,14 @@ async def _fulfill_order(order: dict) -> dict:
                 "shopify_order_name": shopify_order_name,
                 "cj_order_id": cj_order_id,
                 "unmapped_items": unmapped,
+            }
+            await send_order_notification(
+                order_id=shopify_order_id,
+                order_name=shopify_order_name,
+                items=order.get("line_items", []),
+                total=order.get("total_price", "0"),
+                customer=order.get("customer", {})
+            )
             }
         else:
             error_msg = result.get("message", "CJ returned result=false")
